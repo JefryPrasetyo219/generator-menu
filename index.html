@@ -3,14 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Generator Daftar Harga Salon Kecantikan</title>
+    <title>Generator Daftar Harga Salon v2 (dengan Edit & Tambah)</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Playfair+Display:wght@700&display=swap');
 
+        :root {
+            --primary-color: #c2185b;
+            --secondary-color: #ad1457;
+            --light-pink: #fce4ec;
+            --light-pink-border: #f8bbd0;
+            --text-color: #333;
+        }
+
         body {
             font-family: 'Poppins', sans-serif;
-            background-color: #fce4ec; /* Light pink background */
-            color: #333;
+            background-color: var(--light-pink);
+            color: var(--text-color);
             line-height: 1.6;
             margin: 0;
             padding: 20px;
@@ -26,20 +34,22 @@
             padding: 30px;
             border-radius: 10px;
             box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
         }
 
         header h1 {
             font-family: 'Playfair Display', serif;
-            color: #c2185b; /* Deep pink */
+            color: var(--primary-color);
             text-align: center;
             margin-bottom: 10px;
         }
         
-        header p {
+        header p, header .info {
             text-align: center;
             color: #555;
-            margin-bottom: 30px;
+            margin-bottom: 15px;
         }
+        .info { font-style: italic; font-size: 0.9em; }
 
         .form-grid {
             display: grid;
@@ -48,156 +58,81 @@
             margin-bottom: 30px;
         }
 
-        .form-group {
-            display: flex;
-            flex-direction: column;
-        }
-
-        label {
-            font-weight: 600;
-            margin-bottom: 5px;
-            color: #ad1457; /* Medium pink */
-        }
-
-        input[type="text"], select {
+        .form-group { display: flex; flex-direction: column; }
+        label { font-weight: 600; margin-bottom: 5px; color: var(--secondary-color); }
+        input[type="text"], input[type="number"], select {
             padding: 10px;
             border: 1px solid #ddd;
             border-radius: 5px;
             font-family: 'Poppins', sans-serif;
             font-size: 16px;
         }
-        
         input:focus, select:focus {
             outline: none;
-            border-color: #c2185b;
+            border-color: var(--primary-color);
             box-shadow: 0 0 5px rgba(194, 24, 91, 0.2);
         }
 
         .btn-generate {
-            background: linear-gradient(45deg, #c2185b, #ad1457);
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            font-size: 16px;
-            font-weight: 600;
-            border-radius: 5px;
-            cursor: pointer;
-            width: 100%;
-            transition: transform 0.2s, box-shadow 0.2s;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            color: white; border: none; padding: 12px 20px; font-size: 16px; font-weight: 600;
+            border-radius: 5px; cursor: pointer; width: 100%; transition: transform 0.2s, box-shadow 0.2s;
             margin-top: 10px;
         }
+        .btn-generate:hover { transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
 
-        .btn-generate:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-        }
-
-        #output-container {
-            margin-top: 30px;
-            padding: 30px;
-            border: 1px dashed #e1bee7; /* Light purple dashed border */
-            border-radius: 8px;
-            background-color: #fdfcff;
-            display: none; /* Hidden by default */
-        }
-
-        .price-list-header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .price-list-header h2 {
-            font-family: 'Playfair Display', serif;
-            color: #333;
-            margin: 0;
-        }
-
-        .price-list-header p {
-            font-style: italic;
-            color: #666;
-            margin-top: 5px;
-        }
+        #output-container { display: none; }
+        #output-container .price-list-header { text-align: center; margin-bottom: 30px; }
+        #output-container .price-list-header h2 { font-family: 'Playfair Display', serif; color: var(--text-color); margin: 0; }
+        #output-container .price-list-header p { font-style: italic; color: #666; margin-top: 5px; }
 
         .category-title {
-            font-family: 'Playfair Display', serif;
-            color: #c2185b;
-            border-bottom: 2px solid #f8bbd0; /* Very light pink */
-            padding-bottom: 5px;
-            margin-top: 30px;
-            margin-bottom: 15px;
+            font-family: 'Playfair Display', serif; color: var(--primary-color);
+            border-bottom: 2px solid var(--light-pink-border);
+            padding-bottom: 5px; margin-top: 30px; margin-bottom: 15px;
         }
 
-        table.price-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
-        }
+        .price-table { width: 100%; border-collapse: collapse; margin-bottom: 10px; }
+        .price-table th, .price-table td { padding: 12px 15px; text-align: left; vertical-align: middle; }
+        .price-table td:nth-child(2) { text-align: right; font-weight: 600; color: #4a4a4a; width: 180px;}
+        .price-table td:last-child { text-align: right; width: 130px; }
+        .price-table tr:nth-child(even) { background-color: #fce4ec2a; }
 
-        .price-table th, .price-table td {
-            padding: 12px 15px;
-            text-align: left;
+        .edit-controls button, .add-service-row button {
+            font-size: 0.8em; padding: 4px 8px; margin-left: 5px; cursor: pointer;
+            border-radius: 4px; border: 1px solid transparent;
         }
+        .btn-edit { background-color: #e0e0e0; color: #333; }
+        .btn-save { background-color: #4CAF50; color: white; }
+        .btn-delete { background-color: #f44336; color: white; }
+        .btn-cancel { background-color: #757575; color: white; }
         
-        .price-table td:last-child {
-            text-align: right;
-            font-weight: 600;
-            color: #4a4a4a;
+        .btn-add-service {
+            display: block; margin: 10px auto 20px auto; padding: 8px 16px;
+            background-color: var(--secondary-color); color: white; border: none;
+            border-radius: 5px; cursor: pointer; font-weight: 500;
         }
+        .btn-add-service:hover { background-color: var(--primary-color); }
+        .add-service-row input { width: 95%; }
 
-        .price-table tr:nth-child(even) {
-            background-color: #fce4ec2a;
-        }
+        .action-buttons { text-align: center; margin-top: 30px; display: flex; gap: 15px; justify-content: center; }
+        .btn-action { padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-size: 15px; }
+        .btn-action.copy { background-color: #4CAF50; color: white; }
+        .btn-action.print { background-color: #2196F3; color: white; }
+        .btn-action:hover { opacity: 0.9; }
+
+        #copy-feedback { text-align: center; color: green; font-weight: bold; margin-top: 15px; display: none; }
         
-        .action-buttons {
-            text-align: center;
-            margin-top: 30px;
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-        }
-
-        .btn-action {
-            background-color: #4CAF50;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 15px;
-        }
-        
-        .btn-action.print {
-            background-color: #2196F3;
-        }
-
-        .btn-action:hover {
-            opacity: 0.9;
-        }
-
-        #copy-feedback {
-            text-align: center;
-            color: green;
-            font-weight: bold;
-            margin-top: 15px;
-            display: none;
-        }
-
-        /* Print styles */
         @media print {
-            body {
-                background-color: #fff;
-                padding: 0;
-            }
-            .container, .btn-generate, header p, .action-buttons {
-                display: none;
+            body { background-color: #fff; padding: 0; margin: 20px; }
+            .container:first-child, .action-buttons, .edit-controls, .btn-add-service, .add-service-row {
+                display: none !important;
             }
             #output-container {
-                display: block !important;
-                box-shadow: none;
-                border: none;
-                padding: 0;
-                margin: 0;
+                display: block !important; box-shadow: none; border: none;
+                padding: 0; margin: 0; width: 100%; max-width: 100%;
             }
+            .price-table td:last-child { display: none; }
         }
     </style>
 </head>
@@ -205,22 +140,23 @@
 
     <div class="container">
         <header>
-            <h1>Generator Daftar Harga Salon</h1>
-            <p>Buat daftar harga profesional untuk salon kecantikan Anda secara instan.</p>
+            <h1>Generator Daftar Harga Salon v2</h1>
+            <p>Buat, edit, dan tambah layanan untuk daftar harga salon Anda.</p>
+            <p class="info">Setelah daftar harga dibuat, Anda dapat mengedit, menghapus, atau menambahkan layanan baru langsung di tabel.</p>
         </header>
 
         <div id="input-form">
             <div class="form-grid">
                 <div class="form-group">
                     <label for="salonName">Nama Salon</label>
-                    <input type="text" id="salonName" placeholder="Contoh: Cantika Beauty Lounge" value="Cantika Beauty Lounge">
+                    <input type="text" id="salonName" value="Cantika Beauty Lounge">
                 </div>
                 <div class="form-group">
                     <label for="salonTagline">Tagline / Slogan</label>
-                    <input type="text" id="salonTagline" placeholder="Contoh: Your Beauty is Our Priority" value="Your Beauty is Our Priority">
+                    <input type="text" id="salonTagline" value="Your Beauty is Our Priority">
                 </div>
                 <div class="form-group">
-                    <label for="priceTier">Tingkat Harga</label>
+                    <label for="priceTier">Tingkat Harga Awal</label>
                     <select id="priceTier">
                         <option value="ekonomis">Ekonomis (Rp)</option>
                         <option value="menengah" selected>Menengah (Rp)</option>
@@ -228,107 +164,40 @@
                     </select>
                 </div>
             </div>
-            <button id="generateBtn" class="btn-generate">Buat Daftar Harga</button>
+            <button id="generateBtn" class="btn-generate">Buat & Edit Daftar Harga</button>
         </div>
     </div>
     
     <div class="container" id="output-container">
-        <!-- Content will be generated by JavaScript here -->
         <div id="price-list-content"></div>
         <div class="action-buttons">
-            <button id="copyBtn" class="btn-action">Salin Teks</button>
+            <button id="copyBtn" class="btn-action copy">Salin Teks</button>
             <button id="printBtn" class="btn-action print">Cetak</button>
         </div>
         <div id="copy-feedback">Teks berhasil disalin!</div>
     </div>
 
     <script>
-        // Data Layanan Salon
-        const services = {
-            "Perawatan Rambut": [
-                "Potong Rambut + Cuci",
-                "Cuci + Blow Dry",
-                "Creambath Tradisional",
-                "Hair Spa (L'Oréal/Makarizo)",
-                "Hair Mask (L'Oréal/Makarizo)",
-                "Styling (Catok/Curly)"
-            ],
-            "Pewarnaan & Tekstur": [
-                "Pewarnaan (Akar)",
-                "Pewarnaan (Rambut Pendek)",
-                "Pewarnaan (Rambut Sedang)",
-                "Pewarnaan (Rambut Panjang)",
-                "Highlight / Lowlight",
-                "Balayage / Ombre",
-                "Smoothing / Rebonding (Pendek)",
-                "Smoothing / Rebonding (Panjang)"
-            ],
-            "Perawatan Wajah (Facial)": [
-                "Facial Dasar (Basic)",
-                "Facial Anti-Acne",
-                "Facial Pencerah (Brightening)",
-                "Facial Anti-Aging (Emas)",
-                "Mikrodermabrasi"
-            ],
-            "Perawatan Tangan & Kaki": [
-                "Manicure Klasik",
-                "Pedicure Klasik",
-                "Nail Polish (Kutek Biasa)",
-                "Gel Polish (Kutek Gel)",
-                "Nail Art Sederhana"
-            ],
-            "Perawatan Tubuh": [
-                "Body Massage (60 menit)",
-                "Body Scrub / Lulur",
-                "Totok Wajah"
-            ],
-            "Paket Spesial": [
-                "Paket Rileks (Creambath + Totok Wajah)",
-                "Paket Cantik (Facial Basic + Manicure)",
-                "Paket Pernikahan (Konsultasi)"
-            ]
+        // --- DATA AWAL (DEFAULT) ---
+        const initialServices = {
+            "Perawatan Rambut": ["Potong Rambut + Cuci", "Cuci + Blow Dry", "Creambath Tradisional", "Hair Spa", "Hair Mask", "Styling (Catok/Curly)"],
+            "Pewarnaan & Tekstur": ["Pewarnaan (Akar)", "Pewarnaan (Rambut Pendek)", "Pewarnaan (Rambut Panjang)", "Balayage / Ombre", "Smoothing (Pendek)", "Smoothing (Panjang)"],
+            "Perawatan Wajah (Facial)": ["Facial Dasar (Basic)", "Facial Anti-Acne", "Facial Pencerah", "Mikrodermabrasi"],
+            "Perawatan Tangan & Kaki": ["Manicure Klasik", "Pedicure Klasik", "Gel Polish (Kutek Gel)", "Nail Art"],
+            "Perawatan Tubuh": ["Body Massage (60 menit)", "Body Scrub / Lulur", "Totok Wajah"],
         };
 
-        // Harga Dasar (Tingkat Menengah)
         const basePrices = {
-            "Potong Rambut + Cuci": 75000,
-            "Cuci + Blow Dry": 50000,
-            "Creambath Tradisional": 85000,
-            "Hair Spa (L'Oréal/Makarizo)": 120000,
-            "Hair Mask (L'Oréal/Makarizo)": 110000,
-            "Styling (Catok/Curly)": 60000,
-            "Pewarnaan (Akar)": 250000,
-            "Pewarnaan (Rambut Pendek)": 350000,
-            "Pewarnaan (Rambut Sedang)": 500000,
-            "Pewarnaan (Rambut Panjang)": 700000,
-            "Highlight / Lowlight": 600000,
-            "Balayage / Ombre": 900000,
-            "Smoothing / Rebonding (Pendek)": 450000,
-            "Smoothing / Rebonding (Panjang)": 750000,
-            "Facial Dasar (Basic)": 150000,
-            "Facial Anti-Acne": 180000,
-            "Facial Pencerah (Brightening)": 200000,
-            "Facial Anti-Aging (Emas)": 250000,
-            "Mikrodermabrasi": 300000,
-            "Manicure Klasik": 80000,
-            "Pedicure Klasik": 90000,
-            "Nail Polish (Kutek Biasa)": 50000,
-            "Gel Polish (Kutek Gel)": 150000,
-            "Nail Art Sederhana": 30000,
-            "Body Massage (60 menit)": 150000,
-            "Body Scrub / Lulur": 130000,
-            "Totok Wajah": 70000,
-            "Paket Rileks (Creambath + Totok Wajah)": 140000,
-            "Paket Cantik (Facial Basic + Manicure)": 210000,
-            "Paket Pernikahan (Konsultasi)": 1500000
+            "Potong Rambut + Cuci": 75000, "Cuci + Blow Dry": 50000, "Creambath Tradisional": 85000, "Hair Spa": 120000, "Hair Mask": 110000, "Styling (Catok/Curly)": 60000,
+            "Pewarnaan (Akar)": 250000, "Pewarnaan (Rambut Pendek)": 350000, "Pewarnaan (Rambut Panjang)": 700000, "Balayage / Ombre": 900000, "Smoothing (Pendek)": 450000, "Smoothing (Panjang)": 750000,
+            "Facial Dasar (Basic)": 150000, "Facial Anti-Acne": 180000, "Facial Pencerah": 200000, "Mikrodermabrasi": 300000,
+            "Manicure Klasik": 80000, "Pedicure Klasik": 90000, "Gel Polish (Kutek Gel)": 150000, "Nail Art": 30000,
+            "Body Massage (60 menit)": 150000, "Body Scrub / Lulur": 130000, "Totok Wajah": 70000,
         };
 
-        const priceMultipliers = {
-            ekonomis: 0.7,
-            menengah: 1.0,
-            premium: 1.6
-        };
+        const priceMultipliers = { ekonomis: 0.7, menengah: 1.0, premium: 1.6 };
 
+        // --- ELEMEN DOM ---
         const generateBtn = document.getElementById('generateBtn');
         const outputContainer = document.getElementById('output-container');
         const priceListContent = document.getElementById('price-list-content');
@@ -336,84 +205,181 @@
         const printBtn = document.getElementById('printBtn');
         const copyFeedback = document.getElementById('copy-feedback');
 
-        // Fungsi untuk format mata uang
+        // --- DATA STATE APLIKASI ---
+        let currentServicesData = {};
+
+        // --- FUNGSI ---
         function formatCurrency(amount) {
             return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(amount);
         }
-        
-        // Fungsi utama untuk generate daftar harga
-        generateBtn.addEventListener('click', () => {
-            const salonName = document.getElementById('salonName').value;
-            const salonTagline = document.getElementById('salonTagline').value;
-            const tier = document.getElementById('priceTier').value;
-            const multiplier = priceMultipliers[tier];
+
+        function renderPriceList() {
+            const salonName = document.getElementById('salonName').value || "Nama Salon Anda";
+            const salonTagline = document.getElementById('salonTagline').value || "Tagline Salon Anda";
 
             let html = `
                 <div class="price-list-header">
                     <h2>${salonName}</h2>
                     <p>${salonTagline}</p>
-                </div>
-            `;
+                </div>`;
 
-            for (const category in services) {
+            for (const category in currentServicesData) {
                 html += `<h3 class="category-title">${category}</h3>`;
-                html += `<table class="price-table"><tbody>`;
+                html += `<table class="price-table" data-category="${category}"><tbody>`;
                 
-                services[category].forEach(serviceName => {
-                    const basePrice = basePrices[serviceName] || 0;
-                    // Bulatkan harga ke ribuan terdekat
-                    const finalPrice = Math.round((basePrice * multiplier) / 1000) * 1000;
-                    
+                currentServicesData[category].forEach((service, index) => {
                     html += `
-                        <tr>
-                            <td>${serviceName}</td>
-                            <td>Mulai dari ${formatCurrency(finalPrice)}</td>
+                        <tr data-category="${category}" data-index="${index}">
+                            <td>${service.name}</td>
+                            <td>${formatCurrency(service.price)}</td>
+                            <td class="edit-controls">
+                                <button class="btn-edit">Edit</button>
+                            </td>
                         </tr>
                     `;
                 });
 
                 html += `</tbody></table>`;
+                html += `<button class="btn-add-service" data-category="${category}">+ Tambah Layanan di Kategori Ini</button>`;
             }
 
             priceListContent.innerHTML = html;
+        }
+
+        function handleListClick(e) {
+            const target = e.target;
+            const tr = target.closest('tr');
+
+            // --- EDIT ---
+            if (target.classList.contains('btn-edit')) {
+                const category = tr.dataset.category;
+                const index = parseInt(tr.dataset.index);
+                const service = currentServicesData[category][index];
+
+                tr.innerHTML = `
+                    <td><input type="text" class="edit-name" value="${service.name}" style="width: 95%;"></td>
+                    <td><input type="number" class="edit-price" value="${service.price}" step="1000" style="width: 120px;"></td>
+                    <td class="edit-controls">
+                        <button class="btn-save">Simpan</button>
+                        <button class="btn-delete">Hapus</button>
+                    </td>
+                `;
+            }
+
+            // --- SIMPAN HASIL EDIT ---
+            if (target.classList.contains('btn-save')) {
+                const category = tr.dataset.category;
+                const index = parseInt(tr.dataset.index);
+                
+                const newName = tr.querySelector('.edit-name').value;
+                const newPrice = parseInt(tr.querySelector('.edit-price').value);
+
+                if (newName && newPrice >= 0) {
+                    currentServicesData[category][index] = { name: newName, price: newPrice };
+                    renderPriceList();
+                } else {
+                    alert('Nama layanan dan harga tidak boleh kosong.');
+                }
+            }
+
+            // --- HAPUS ---
+            if (target.classList.contains('btn-delete')) {
+                if (confirm('Anda yakin ingin menghapus layanan ini?')) {
+                    const category = tr.dataset.category;
+                    const index = parseInt(tr.dataset.index);
+                    currentServicesData[category].splice(index, 1);
+                    renderPriceList();
+                }
+            }
+
+            // --- TAMBAH LAYANAN BARU (Tombol) ---
+            if (target.classList.contains('btn-add-service')) {
+                // Hapus form tambah lain jika ada
+                const existingAddForm = document.querySelector('.add-service-row');
+                if(existingAddForm) existingAddForm.remove();
+
+                const category = target.dataset.category;
+                const table = target.previousElementSibling.querySelector('tbody');
+
+                const addRow = document.createElement('tr');
+                addRow.className = 'add-service-row';
+                addRow.innerHTML = `
+                    <td><input type="text" class="new-name" placeholder="Nama Layanan Baru"></td>
+                    <td><input type="number" class="new-price" placeholder="Harga" step="1000"></td>
+                    <td>
+                        <button class="btn-save-new" data-category="${category}">Simpan</button>
+                        <button class="btn-cancel-add">Batal</button>
+                    </td>
+                `;
+                table.appendChild(addRow);
+                addRow.querySelector('.new-name').focus();
+            }
+
+            // --- SIMPAN LAYANAN BARU ---
+            if (target.classList.contains('btn-save-new')) {
+                const category = target.dataset.category;
+                const addRow = target.closest('.add-service-row');
+                const newName = addRow.querySelector('.new-name').value;
+                const newPrice = parseInt(addRow.querySelector('.new-price').value);
+
+                if (newName && newPrice >= 0) {
+                    currentServicesData[category].push({ name: newName, price: newPrice });
+                    renderPriceList();
+                } else {
+                    alert('Nama layanan dan harga tidak boleh kosong.');
+                }
+            }
+
+            // --- BATAL TAMBAH ---
+            if (target.classList.contains('btn-cancel-add')) {
+                target.closest('.add-service-row').remove();
+            }
+        }
+
+
+        // --- EVENT LISTENERS ---
+        generateBtn.addEventListener('click', () => {
+            const tier = document.getElementById('priceTier').value;
+            const multiplier = priceMultipliers[tier];
+            
+            // Reset dan isi data awal
+            currentServicesData = {};
+            for (const category in initialServices) {
+                currentServicesData[category] = initialServices[category].map(serviceName => {
+                    const basePrice = basePrices[serviceName] || 0;
+                    const finalPrice = Math.round((basePrice * multiplier) / 1000) * 1000;
+                    return { name: serviceName, price: finalPrice };
+                });
+            }
+            
+            renderPriceList();
             outputContainer.style.display = 'block';
             copyFeedback.style.display = 'none';
-
-            // Scroll ke hasil
             outputContainer.scrollIntoView({ behavior: 'smooth' });
         });
 
-        // Fungsi untuk menyalin teks
+        priceListContent.addEventListener('click', handleListClick);
+
         copyBtn.addEventListener('click', () => {
             const salonName = document.getElementById('salonName').value;
             const salonTagline = document.getElementById('salonTagline').value;
             
             let textToCopy = `${salonName.toUpperCase()}\n${salonTagline}\n\n`;
 
-            for (const category in services) {
+            for (const category in currentServicesData) {
                 textToCopy += `--- ${category.toUpperCase()} ---\n`;
-                services[category].forEach(serviceName => {
-                    const basePrice = basePrices[serviceName] || 0;
-                    const tier = document.getElementById('priceTier').value;
-                    const multiplier = priceMultipliers[tier];
-                    const finalPrice = Math.round((basePrice * multiplier) / 1000) * 1000;
-                    
-                    textToCopy += `${serviceName}: Mulai dari ${formatCurrency(finalPrice)}\n`;
+                currentServicesData[category].forEach(service => {
+                    textToCopy += `${service.name}: ${formatCurrency(service.price)}\n`;
                 });
                 textToCopy += `\n`;
             }
 
             navigator.clipboard.writeText(textToCopy).then(() => {
                 copyFeedback.style.display = 'block';
-                setTimeout(() => {
-                    copyFeedback.style.display = 'none';
-                }, 2000);
-            }).catch(err => {
-                console.error('Gagal menyalin teks: ', err);
+                setTimeout(() => { copyFeedback.style.display = 'none'; }, 2000);
             });
         });
 
-        // Fungsi untuk mencetak
         printBtn.addEventListener('click', () => {
             window.print();
         });
